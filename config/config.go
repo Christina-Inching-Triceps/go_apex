@@ -7,11 +7,15 @@ import (
 )
 
 type Config struct {
-	Apex Apex `yaml:"apex"`
+	API API `yaml:"api"`
 }
 
-type Apex struct {
-	Token string `yaml:"token"`
+type API struct {
+
+	APEX struct {
+		Header string `yaml:"header"`
+		Token  string `yaml:"token"`
+	}
 }
 
 func Load()(*Config, error) {

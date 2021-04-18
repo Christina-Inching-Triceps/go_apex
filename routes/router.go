@@ -28,7 +28,7 @@ func Router(e* echo.Echo) {
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
-		req.Header.Add("TRN-Api-Key", config.Apex.Token)
+		req.Header.Add(config.API.APEX.Header, config.API.APEX.Token)
 
 		client := new(http.Client)
 		resp, err := client.Do(req)
