@@ -1,0 +1,16 @@
+version: '3'
+services:
+  gopex-db:
+    build: ./db
+    ports:
+      - "3306:3306"
+    container_name: gopex-db
+    volumes:
+      # 初期データを投入するSQLが格納されているdir
+      - ./db/init:/docker-entrypoint-initdb.d
+      # データを永続化するときにマウントするdirを指定
+      - ./db/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gopex
+      TZ: Asia/Tokyo
