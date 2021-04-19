@@ -11,18 +11,17 @@ type Config struct {
 }
 
 type API struct {
-
 	APEX struct {
 		Header string `yaml:"header"`
 		Token  string `yaml:"token"`
 	}
 }
 
-func Load()(*Config, error) {
+func Load() (*Config, error) {
 	// ===== Viper Settings
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("config/")
+	viper.AddConfigPath("infrastructure/config/")
 
 	// ===== Load
 	if err := viper.ReadInConfig(); err != nil {
@@ -38,7 +37,7 @@ func Load()(*Config, error) {
 
 	err := viper.Unmarshal(&cfg)
 	if err != nil {
-	    return nil, fmt.Errorf("[Fatal] Unmarshal error: %s \n", err)
+		return nil, fmt.Errorf("[Fatal] Unmarshal error: %s \n", err)
 	}
 
 	return &cfg, nil
