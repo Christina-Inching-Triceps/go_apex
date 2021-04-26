@@ -17,6 +17,15 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
+	// ===== Init DB Instance
+	// See: https://please-sleep.cou929.nu/go-sql-db-connection-pool.html
+	db, err := infrastructure.NewDB(config)
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	// FIXME: 暫定
+	_ = db
+
 	// ===== Setup Router
 	infrastructure.SetUpRouting(e, config)
 

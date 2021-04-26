@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	API API `yaml:"api"`
+	DB  DB  `yaml:"db"`
 }
 
 type API struct {
@@ -15,6 +16,14 @@ type API struct {
 		Header string `yaml:"header"`
 		Token  string `yaml:"token"`
 	}
+}
+
+type DB struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Database string `yaml:"database"`
 }
 
 func Load() (*Config, error) {
