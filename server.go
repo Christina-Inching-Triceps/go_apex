@@ -1,8 +1,10 @@
 package main
 
 import (
+	"gopex/domain/application"
 	"gopex/infrastructure"
 	"gopex/infrastructure/config"
+	"gopex/infrastructure/persistence"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,10 +26,13 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 	// FIXME: 暫定
-	_ = db
+	ApexTrackerRepository := persistence.NewApexTrackerRepository(db)
+
+	// TODO: create usecase
+	ApexTrackerInteractor := application.NewApexTrackerInteractor(&ApexTrackerRepository)
 
 	// ===== Setup Router
-	infrastructure.SetUpRouting(e, config)
+	infrastructure.InitApexTrackerRouting(e, config, &ApexTrackerInteractor)
 
 	e.Logger.Info(e.Start(":1323"))
 }

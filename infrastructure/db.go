@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // ===== [Public Functions] ==========
@@ -22,7 +23,11 @@ func NewDB(config *config.Config) (*gorm.DB, error) {
 		config.DB.Database)
 
 	// Create DB Instance
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("[Fatal] Failed to open Mysql Connection Open: %s \n", err)
@@ -42,6 +47,7 @@ func NewDB(config *config.Config) (*gorm.DB, error) {
 
 // ===== [Private Functions] ==========
 
+// TODO: 関数名をオプション設定をしてるとわかるように変更
 func setupSqlDB(sqlDB *sql.DB) {
 	// TODO: 特に根拠はなくなんとなく設定
 	sqlDB.SetMaxIdleConns(10)

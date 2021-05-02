@@ -2,7 +2,8 @@ package controller
 
 import (
 	"fmt"
-	"gopex/domain/application"
+	"gopex/infrastructure/config"
+	"gopex/usecase"
 	"io/ioutil"
 	"net/http"
 
@@ -11,12 +12,15 @@ import (
 
 // apex.tracker.ggへの問い合わせを行うController
 type ApexController struct {
-	ApexTrackerInteractor application.ApexTrackerInteractor
+	ApexTrackerUseCase usecase.ApexTrackerUseCase
+	config             *config.Config
 }
 
-// FIXME: ここでDB(Storage)ioを渡していくはず
-func NewApexController() *ApexController {
-	return &ApexController{}
+func NewApexController(usecase *usecase.ApexTrackerUseCase, config *config.Config) *ApexController {
+	return &ApexController{
+		ApexTrackerUseCase: *usecase,
+		config:             config,
+	}
 }
 
 func (controller *ApexController) GetStats(c echo.Context) (err error) {
@@ -30,14 +34,11 @@ func (controller *ApexController) GetStats(c echo.Context) (err error) {
 		return err
 	}
 
-	// FIXME: 外部API callはrepositoryに隠蔽した方がいいかも
-	// repoに隠蔽できるとconfをDB(persistence)レイヤーに依存する形で丸く収まるかも？
-	// req.Header.Add(config.API.APEX.Header, config.API.APEX.Token)
-	controller.ApexTrackerInteractor.GetStats("psn", "userName")
-
 	// TODO: GetStatsから取得したデータを元にOutputPortを作成してcontextにセット
 
 	// FIXME: この辺の処理をinfra層に隠蔽する
+	req.Header.Add(controller.config.API.APEX.Header, controller.config.API.APEX.Token)
+
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -50,7 +51,11 @@ func (controller *ApexController) GetStats(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	c.String(http.StatusOK, string(body))
+
+	created, err := controller.ApexTrackerUseCase.StoreStats(string(body))
+	stats, err := controller.ApexTrackerUseCase.GetStats(created.ID)
+
+	c.String(http.StatusOK, stats)
 
 	return err
 
