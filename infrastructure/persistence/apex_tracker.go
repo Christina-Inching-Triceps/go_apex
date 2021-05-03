@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: rename 実際にはもう少し細かく分かれるはず
 type ApexTrackerRepository struct {
 	db *gorm.DB
 }

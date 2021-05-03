@@ -12,18 +12,10 @@ import (
 )
 
 // ===== [Public Functions] ==========
-
-func NewDB(config *config.Config) (*gorm.DB, error) {
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.DB.User,
-		config.DB.Password,
-		config.DB.Host,
-		config.DB.Port,
-		config.DB.Database)
-
-	// Create DB Instance
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+// 指定したDialectorのDB接続情報用インスタンスを生成する
+func NewDB(config *config.Config, dialector gorm.Dialector) (*gorm.DB, error) {
+	// Create DB Instance and set gorm configs
+	db, err := gorm.Open(dialector, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -38,18 +30,31 @@ func NewDB(config *config.Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("[Fatal] Failed to create database/sql instance: %s \n", err)
 	}
 
-	// Set connection settings
-	setupSqlDB(sqlDB)
+	// Set sql.db parameters
+	setSqlDBOptions(sqlDB)
 
 	// return initialized db ref
 	return db, err
 }
 
+// MySQL用のDB接続
+func OpenMySQLDatabase(config *config.Config) gorm.Dialector {
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.DB.User,
+		config.DB.Password,
+		config.DB.Host,
+		config.DB.Port,
+		config.DB.Database)
+
+	return mysql.Open(dsn)
+}
+
 // ===== [Private Functions] ==========
 
-// TODO: 関数名をオプション設定をしてるとわかるように変更
-func setupSqlDB(sqlDB *sql.DB) {
-	// TODO: 特に根拠はなくなんとなく設定
+// sql.db側の制御オプションを設定する
+func setSqlDBOptions(sqlDB *sql.DB) {
+	// 数値に意図はなく、なんとなくで設定
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(20)
 	sqlDB.SetConnMaxLifetime(time.Hour)

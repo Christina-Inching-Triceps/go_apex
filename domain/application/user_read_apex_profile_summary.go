@@ -6,17 +6,17 @@ import (
 	"gopex/usecase"
 )
 
-type ApexTrackerInteractor struct {
+type UserReadApexProfileSummaryInteractor struct {
 	apexTrackerRepository repository.ApexTrackerRepository
 }
 
-func NewApexTrackerInteractor(apexTrackerRepository *repository.ApexTrackerRepository) usecase.ApexTrackerUseCase {
-	return &ApexTrackerInteractor{
+func NewUserReadApexProfileSummaryInteractor(apexTrackerRepository *repository.ApexTrackerRepository) usecase.UserReadApexProfileSummaryUseCase {
+	return &UserReadApexProfileSummaryInteractor{
 		apexTrackerRepository: *apexTrackerRepository,
 	}
 }
 
-func (interactor *ApexTrackerInteractor) GetStats(id uint) (string, error) {
+func (interactor *UserReadApexProfileSummaryInteractor) GetStats(id uint) (string, error) {
 	row, err := interactor.apexTrackerRepository.Find(id)
 	if err != nil {
 		return "", err
@@ -24,7 +24,7 @@ func (interactor *ApexTrackerInteractor) GetStats(id uint) (string, error) {
 	return row.Content, err
 }
 
-func (interactor *ApexTrackerInteractor) StoreStats(content string) (entity.ApexTracker, error) {
+func (interactor *UserReadApexProfileSummaryInteractor) StoreStats(content string) (entity.ApexTracker, error) {
 	created := entity.ApexTracker{Content: content}
 	result := interactor.apexTrackerRepository.Create(&created)
 	return created, result
