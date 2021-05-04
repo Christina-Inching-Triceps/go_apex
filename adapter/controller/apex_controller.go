@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"gopex/infrastructure/config"
 	"gopex/usecase"
 	apiUsecase "gopex/usecase/api"
@@ -16,7 +18,10 @@ type ApexController struct {
 	config                            *config.Config
 }
 
-func NewApexController(usecase *usecase.UserReadApexProfileSummaryUseCase, api *apiUsecase.GetApexTrackerStatsUseCase, config *config.Config) *ApexController {
+func NewApexController(
+	usecase *usecase.UserReadApexProfileSummaryUseCase,
+	api *apiUsecase.GetApexTrackerStatsUseCase,
+	config *config.Config) *ApexController {
 	return &ApexController{
 		UserReadApexProfileSummaryUseCase: *usecase,
 		GetApexTrackerStatsUseCase:        *api,
@@ -27,19 +32,30 @@ func NewApexController(usecase *usecase.UserReadApexProfileSummaryUseCase, api *
 func (controller *ApexController) GetStats(c echo.Context) (err error) {
 	input := apiUsecase.GetApexTrackerStatsInput{
 		Platform: "psn",
-		Id:       "raru_ex",
+		ID:       "raru_ex",
 	}
 
-	body, err := controller.GetApexTrackerStatsUseCase.GetStats(input)
+	body, err := controller.GetApexTrackerStatsUseCase.GetStatsWithContext(context.Background(), input)
 	if err != nil {
-		return err
+		return fmt.Errorf("[Fatal] Request to apex.tracker.gg is failed : %w \n", err)
 	}
 
 	created, err := controller.UserReadApexProfileSummaryUseCase.StoreStats(body.Data)
-	stats, err := controller.UserReadApexProfileSummaryUseCase.GetStats(created.ID)
+	if err != nil {
+		return fmt.Errorf("[Fatal] Failed to store tracker stats to db: %w \n", err)
+	}
 
-	c.String(http.StatusOK, stats)
+	stats, err := controller.UserReadApexProfileSummaryUseCase.GetStats(created.ID)
+	if err != nil {
+		return fmt.Errorf("[Fatal] Failed to select stats from db: %w \n", err)
+	}
+
+	err = c.String(http.StatusOK, stats)
+	if err != nil {
+		err = fmt.Errorf("[Fatal] Failed to create response by echo: %w \n", err)
+
+		return err
+	}
 
 	return err
-
 }

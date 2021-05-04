@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -34,19 +35,21 @@ func Load() (*Config, error) {
 
 	// ===== Load
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, fmt.Errorf("[Fatal] File Not Found: %s \n", err)
+		var vError viper.ConfigFileNotFoundError
+		ok := errors.As(err, &vError)
+
+		if ok {
+			return nil, fmt.Errorf("[Fatal] File Not Found: %w \n", err)
 		} else {
-			return nil, fmt.Errorf("[Fatal] File is exists, but other error happened: %s \n", err)
+			return nil, fmt.Errorf("[Fatal] File is exists, but other error happened: %w \n", err)
 		}
 	}
 
 	// ===== Bind Configs to Struct
 	var cfg Config
 
-	err := viper.Unmarshal(&cfg)
-	if err != nil {
-		return nil, fmt.Errorf("[Fatal] Unmarshal error: %s \n", err)
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return nil, fmt.Errorf("[Fatal] Unmarshal error: %w \n", err)
 	}
 
 	return &cfg, nil

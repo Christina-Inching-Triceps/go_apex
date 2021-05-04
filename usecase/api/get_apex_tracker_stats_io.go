@@ -2,7 +2,7 @@ package api
 
 type GetApexTrackerStatsInput struct {
 	Platform string
-	Id       string
+	ID       string
 }
 
 type GetApexTrackerStatsOutput struct {

@@ -1,6 +1,7 @@
 package external
 
 import (
+	"context"
 	"fmt"
 	"gopex/adapter/api"
 	"gopex/infrastructure/config"
@@ -12,32 +13,37 @@ type ApexTrackerClient struct {
 	config *config.Config
 }
 
-func NewApexTrackerApi(config *config.Config) api.ApexTrackerClient {
+func NewApexTrackerClient(config *config.Config) api.ApexTrackerClient {
 	return &ApexTrackerClient{
 		config: config,
 	}
 }
 
-func (api *ApexTrackerClient) GetStats(platform string, id string) (string, error) {
+func (api *ApexTrackerClient) GetStatsWithContext(ctx context.Context, platform string, id string) (string, error) {
 	url := fmt.Sprintf("https://public-api.tracker.gg/v2/apex/standard/profile/%s/%s", "psn", "raru_ex")
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("[Fatal] Failed to create http request instance: %w \n", err)
 	}
 
-	// FIXME: この辺の処理をinfra層に隠蔽する
 	req.Header.Add(api.config.API.APEX.Header, api.config.API.APEX.Token)
 
 	client := new(http.Client)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("[Fatal] Failed to request execution: %w \n", err)
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		err = fmt.Errorf("[Fatal] Failed to read response body: %w \n", err)
+
+		return "", err
+	}
+
 	return string(body), err
 }

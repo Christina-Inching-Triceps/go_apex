@@ -25,5 +25,6 @@ func (repo *ApexTrackerRepository) Create(row *entity.ApexTracker) (err error) {
 
 func (repo *ApexTrackerRepository) Find(id uint) (row *entity.ApexTracker, err error) {
 	result := repo.db.Model(&entity.ApexTracker{}).First(&row, id)
+
 	return row, result.Error
 }

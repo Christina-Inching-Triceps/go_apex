@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"fmt"
 	"gopex/adapter/api"
 	usecase "gopex/usecase/api"
 )
@@ -15,11 +17,17 @@ func NewGetApexTrackerStatsInteractor(client *api.ApexTrackerClient) usecase.Get
 	}
 }
 
-func (interactor *GetApexTrackerStatsInteractor) GetStats(input usecase.GetApexTrackerStatsInput) (usecase.GetApexTrackerStatsOutput, error) {
-	stats, err := interactor.client.GetStats(
+func (interactor *GetApexTrackerStatsInteractor) GetStatsWithContext(ctx context.Context, input usecase.GetApexTrackerStatsInput) (usecase.GetApexTrackerStatsOutput, error) {
+	stats, err := interactor.client.GetStatsWithContext(
+		ctx,
 		input.Platform,
-		input.Id,
+		input.ID,
 	)
+	if err != nil {
+		err = fmt.Errorf("[Fatal] Failed to request to apex.tracker.gg stats endpoint: %w \n", err)
+
+		return usecase.GetApexTrackerStatsOutput{}, err
+	}
 
 	output := usecase.GetApexTrackerStatsOutput{
 		Data: stats,

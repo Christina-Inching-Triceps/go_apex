@@ -2,7 +2,12 @@
 
 apex.tracker.gg API sample
 
+
 ## Develop
+
+### Required
+
+- golangci-lint
 
 ### config
 
@@ -27,6 +32,7 @@ db:
 1. Repository用の実装 (apiはベタガキ)
 1. API用の実装の切り出し
 1. テストコードの実装
+1. go-lintの設定
 
 ## Note/Questions
 

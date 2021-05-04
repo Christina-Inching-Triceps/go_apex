@@ -15,6 +15,7 @@ import (
 func main() {
 	// ===== Init Echo Server
 	e := echo.New()
+	e.Debug = true
 
 	// ===== Load Config File
 	config, err := config.Load()
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	apexTrackerRepository := persistence.NewApexTrackerRepository(db)
-	apexTrackerClient := external.NewApexTrackerApi(config)
+	apexTrackerClient := external.NewApexTrackerClient(config)
 
 	// FIXME: apiのinteractorをcontrollerに仕込んで逐次実行して
 
@@ -39,7 +40,11 @@ func main() {
 	getApexTrackerStatsInteractor := apiApplication.NewGetApexTrackerStatsInteractor(&apexTrackerClient)
 
 	// ===== Setup Router
-	apexTrackerController := controller.NewApexController(&userReadApexProfileSummaryInteractor, &getApexTrackerStatsInteractor, config)
+	apexTrackerController := controller.NewApexController(
+		&userReadApexProfileSummaryInteractor,
+		&getApexTrackerStatsInteractor,
+		config,
+	)
 	infrastructure.InitApexTrackerRouting(e, config, apexTrackerController)
 
 	e.Logger.Info(e.Start(":1323"))

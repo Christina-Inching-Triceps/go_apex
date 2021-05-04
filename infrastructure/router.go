@@ -9,7 +9,5 @@ import (
 
 // EchoのRouting情報をセットアップします
 func InitApexTrackerRouting(e *echo.Echo, config *config.Config, controller *controller.ApexController) {
-
 	e.GET("api/get", controller.GetStats)
-
 }

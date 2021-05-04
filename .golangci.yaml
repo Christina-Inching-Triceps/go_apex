@@ -1,0 +1,20 @@
+linters:
+  enable-all: true
+  disable:
+    - godot
+    - godox
+    - gci
+    - exhaustivestruct #gorm使う以上仕方ないので
+    - lll
+    - golint # deprecatedになっていたため
+    - interfacer
+    - scopelint
+    - maligned
+    - stylecheck
+
+linters-settings:
+  revive:
+    rules:
+      - name: var-naming
+        arguments: [["SQL"], ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "LHS", "QPS", "RAM", "RHS", "RPC", "SLA", "SMTP", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS"]] #[whitelist, blacklist]
+

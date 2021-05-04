@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm/schema"
 )
 
+// ===== [Constants] ==========
+const (
+	MaxIdelConnNum int = 10
+	MaxOpenConnNum int = 20
+)
+
 // ===== [Public Functions] ==========
 // 指定したDialectorのDB接続情報用インスタンスを生成する
 func NewDB(config *config.Config, dialector gorm.Dialector) (*gorm.DB, error) {
@@ -20,14 +26,15 @@ func NewDB(config *config.Config, dialector gorm.Dialector) (*gorm.DB, error) {
 			SingularTable: true,
 		},
 	})
-
 	if err != nil {
-		return nil, fmt.Errorf("[Fatal] Failed to open Mysql Connection Open: %s \n", err)
+		return nil, fmt.Errorf("[Fatal] Failed to open Mysql Connection Open: %w \n", err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		return nil, fmt.Errorf("[Fatal] Failed to create database/sql instance: %s \n", err)
+		err = fmt.Errorf("[Fatal] Failed to create database/sql instance: %w \n", err)
+
+		return nil, err
 	}
 
 	// Set sql.db parameters
@@ -55,7 +62,7 @@ func OpenMySQLDatabase(config *config.Config) gorm.Dialector {
 // sql.db側の制御オプションを設定する
 func setSqlDBOptions(sqlDB *sql.DB) {
 	// 数値に意図はなく、なんとなくで設定
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(20)
+	sqlDB.SetMaxIdleConns(MaxIdelConnNum)
+	sqlDB.SetMaxOpenConns(MaxOpenConnNum)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 }

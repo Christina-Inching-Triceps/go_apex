@@ -1,5 +1,7 @@
 package api
 
+import "context"
+
 type ApexTrackerClient interface {
-	GetStats(platform string, id string) (string, error)
+	GetStatsWithContext(ctx context.Context, platform string, id string) (string, error)
 }

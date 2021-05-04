@@ -1,5 +1,7 @@
 package api
 
+import "context"
+
 type GetApexTrackerStatsUseCase interface {
-	GetStats(input GetApexTrackerStatsInput) (GetApexTrackerStatsOutput, error)
+	GetStatsWithContext(ctx context.Context, input GetApexTrackerStatsInput) (GetApexTrackerStatsOutput, error)
 }
